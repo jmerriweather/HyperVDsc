@@ -95,7 +95,7 @@ function Get-TargetResource
         Path                        = $vmobj.Path
         Generation                  = $vmobj.Generation
         SecureBoot                  = $vmSecureBootState
-        TpmEnabled                  = $vmTPMState
+        EnableTPM                   = $vmTPMState
         StartupMemory               = $vmobj.MemoryStartup
         MinimumMemory               = $vmobj.MemoryMinimum
         MaximumMemory               = $vmobj.MemoryMaximum
@@ -443,8 +443,8 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ($script:localizedData.VMPropertyShouldBe -f 'TPMEnabled', $EnableTPM, $vmTPMEnabled)
 
-                    # Cannot change the TPM state whilst the VM is powered on.
-                    if (-not $EnableTPM)
+                    # Bring the TPM state in line with the desired state (restarts the VM if needed).
+                    if ($EnableTPM)
                     {
                         # The default value for the key protector is 0,0,0,4
                         $keyProtectorDefaultValue = @(0,0,0,4)

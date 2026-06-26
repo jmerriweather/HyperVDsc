@@ -387,12 +387,13 @@ try
 
                 It 'Calls Get-VMFirmware if a generation 2 VM' {
                     Mock -CommandName Get-VMFirmware -MockWith { return $true }
+                    Mock -CommandName Get-VMSecurity -MockWith { return @{ TpmEnabled = $false } }
                     $null = Get-TargetResource -Name 'Generation2VM' -VhdPath $stubVhdxDisk.Path
                     Assert-MockCalled -CommandName Get-VMFirmware -Scope It -Exactly 1
                 }
 
                 It 'Calls Get-VMSecurity if a generation 2 VM' {
-                    Mock -CommandName Get-VMSecurity -MockWith { return $true }
+                    Mock -CommandName Get-VMSecurity -MockWith { return @{ TpmEnabled = $false } }
                     $null = Get-TargetResource -Name 'Generation2VM' -VhdPath $stubVhdxDisk.Path
                     Assert-MockCalled -CommandName Get-VMSecurity -Scope It -Exactly 1
                 }
@@ -519,14 +520,18 @@ try
                     Test-TargetResource -Name 'Generation2VM' -SecureBoot $false -Generation 2 @testParams | Should -Be $false
                 }
 
-                It 'Returns $true when TpmEnabled is disabled and requested "TpmEnabled" = "$true"' {
-                    Mock -CommandName Test-VMSecurity -MockWith { return $false }
-                    Test-TargetResource -Name 'Generation2VM' -TpmEnabled $true -Generation 2 @testParams | Should -Be $true
+                It 'Returns $true when TPM is enabled and requested "EnableTPM" = "$true"' {
+                    Mock -CommandName Test-VMTpmEnabled -MockWith { return $true }
+
+                    Test-TargetResource -Name 'Generation2VM' -EnableTPM $true -Generation 2 @testParams |
+                        Should -BeTrue
                 }
 
-                It 'Returns $false when TpmEnabled is disabled and requested "TpmEnabled" = "$false"' {
-                    Mock -CommandName Test-VMSecurity -MockWith { return $false }
-                    Test-TargetResource -Name 'Generation2VM' TpmEnabled $false -Generation 2 @testParams | Should -Be $false
+                It 'Returns $false when TPM is disabled and requested "EnableTPM" = "$true"' {
+                    Mock -CommandName Test-VMTpmEnabled -MockWith { return $false }
+
+                    Test-TargetResource -Name 'Generation2VM' -EnableTPM $true -Generation 2 @testParams |
+                        Should -BeFalse
                 }
 
                 It 'Returns $true when VM has snapshot chain' {
@@ -622,6 +627,8 @@ try
                 Mock -CommandName Get-VMNetworkAdapter -MockWith { return $stubVM.NetworkAdapters.IpAddresses }
                 Mock -CommandName Set-VMState -MockWith { return $true }
                 Mock -CommandName Set-VMMemory
+                # Default TPM state for generation 2 VMs so the new TPM code path does not hit the Hyper-V stub.
+                Mock -CommandName Test-VMTpmEnabled -MockWith { return $false }
 
                 It 'Removes an existing VM when "Ensure" = "Absent"' {
                     Set-TargetResource -Name 'RunningVM' -Ensure Absent @testParams

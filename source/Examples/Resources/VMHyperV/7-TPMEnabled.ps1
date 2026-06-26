@@ -1,6 +1,26 @@
 <#
+    .SYNOPSIS
+        Creates a Generation 2 VM with the Trusted Platform Module (TPM) enabled.
+
     .DESCRIPTION
-        Create a new VM.
+        Creates a new Generation 2 virtual machine and enables the Trusted
+        Platform Module (TPM) on it.
+
+    .PARAMETER NodeName
+        The names of one or more nodes to compile a configuration for.
+        Defaults to 'localhost'.
+
+    .PARAMETER VMName
+        The name of the virtual machine to create.
+
+    .PARAMETER VhdPath
+        The path to the VHDX file to associate with the virtual machine.
+
+    .EXAMPLE
+        Example -VMName 'TPMVM' -VhdPath 'C:\VMs\TPMVM.vhdx'
+
+        Compiles a configuration that creates a Generation 2 VM named 'TPMVM'
+        with TPM enabled.
 #>
 configuration Example
 {
