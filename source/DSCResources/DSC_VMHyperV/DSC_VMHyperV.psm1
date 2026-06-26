@@ -452,7 +452,8 @@ function Set-TargetResource
                         $isVMKeyProtectorDefault = -not(Compare-Object -ReferenceObject (Get-VMKeyProtector -VMName $Name) -DifferenceObject $keyProtectorDefaultValue)
 
                         # If the VM has a default key protector, we need to create a new one before enabling the TPM
-                        if ($isVMKeyProtectorDefault) {
+                        if ($isVMKeyProtectorDefault)
+                        {
                             Set-VMKeyProtector -VMName $Name -NewLocalKeyProtector
                         }
 
@@ -638,7 +639,8 @@ function Set-TargetResource
                     $isVMKeyProtectorDefault = -not(Compare-Object -ReferenceObject (Get-VMKeyProtector -VMName $Name) -DifferenceObject $keyProtectorDefaultValue)
 
                     # If the VM has a default key protector, we need to create a new one before enabling the TPM
-                    if ($isVMKeyProtectorDefault) {
+                    if ($isVMKeyProtectorDefault)
+                    {
                         Set-VMKeyProtector -VMName $Name -NewLocalKeyProtector
                     }
 
