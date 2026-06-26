@@ -16,6 +16,12 @@
     .PARAMETER VhdPath
         The path to the VHDX file to associate with the virtual machine.
 
+    .INPUTS
+        None.
+
+    .OUTPUTS
+        None.
+
     .EXAMPLE
         Example -VMName 'TPMVM' -VhdPath 'C:\VMs\TPMVM.vhdx'
 
