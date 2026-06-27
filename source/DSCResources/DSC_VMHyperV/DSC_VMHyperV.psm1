@@ -436,7 +436,10 @@ function Set-TargetResource
                     Set-VMProperty @setVMPropertyParams
                     Write-Verbose -Message ($script:localizedData.VMPropertySet -f 'SecureBoot', $SecureBoot)
                 }
+            }
 
+            if ($vmObj.Generation -eq 2)
+            {
                 # Retrive the current TPM state
                 $vmTPMEnabled = Test-VMTpmEnabled -Name $Name
                 if ($EnableTPM -ne $vmTPMEnabled)
