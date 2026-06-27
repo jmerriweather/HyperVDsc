@@ -802,6 +802,35 @@ try
                     Assert-MockCalled -CommandName Set-VMProperty -ParameterFilter { $VMCommand -eq 'Set-VMFirmware' } -Exactly 1 -Scope It
                 }
 
+                It 'Enables TPM without prompting when an existing generation 2 VM has TPM disabled' {
+                    Mock -CommandName Test-VMSecureBoot -MockWith { return $true }
+                    Mock -CommandName Test-VMTpmEnabled -MockWith { return $false }
+                    Mock -CommandName Get-VMKeyProtector -MockWith { return @(0, 0, 0, 4) }
+                    Mock -CommandName Set-VMKeyProtector
+                    Mock -CommandName Set-VMProperty
+
+                    Set-TargetResource -Name 'StoppedVM' -Generation 2 -EnableTPM $true @testParams
+
+                    Assert-MockCalled -CommandName Set-VMKeyProtector -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-VMProperty -ParameterFilter {
+                        $VMCommand -eq 'Enable-VMTPM' -and
+                        $ChangeProperty.Confirm -eq $false
+                    } -Exactly 1 -Scope It
+                }
+
+                It 'Disables TPM without prompting when an existing generation 2 VM has TPM enabled' {
+                    Mock -CommandName Test-VMSecureBoot -MockWith { return $true }
+                    Mock -CommandName Test-VMTpmEnabled -MockWith { return $true }
+                    Mock -CommandName Set-VMProperty
+
+                    Set-TargetResource -Name 'StoppedVM' -Generation 2 -EnableTPM $false @testParams
+
+                    Assert-MockCalled -CommandName Set-VMProperty -ParameterFilter {
+                        $VMCommand -eq 'Disable-VMTPM' -and
+                        $ChangeProperty.Confirm -eq $false
+                    } -Exactly 1 -Scope It
+                }
+
                 It 'Does call "Enable-VMIntegrationService" when "EnableGuestService" = "$true"' {
                     Mock -CommandName Enable-VMIntegrationService
                     Set-TargetResource -Name 'RunningVM' -EnableGuestService $true @testParams

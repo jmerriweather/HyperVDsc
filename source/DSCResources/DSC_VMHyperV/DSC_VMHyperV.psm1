@@ -460,6 +460,9 @@ function Set-TargetResource
                         $setVMPropertyParams = @{
                             VMName          = $Name
                             VMCommand       = 'Enable-VMTPM'
+                            ChangeProperty  = @{
+                                Confirm = $false
+                            }
                             RestartIfNeeded = $RestartIfNeeded
                         }
                     }
@@ -468,6 +471,9 @@ function Set-TargetResource
                         $setVMPropertyParams = @{
                             VMName          = $Name
                             VMCommand       = 'Disable-VMTPM'
+                            ChangeProperty  = @{
+                                Confirm = $false
+                            }
                             RestartIfNeeded = $RestartIfNeeded
                         }
                     }
